@@ -1,0 +1,12 @@
+import { Pinecone } from "@pinecone-database/pinecone";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import dotenv from "dotenv";
+dotenv.config();
+const pinecone = new Pinecone();
+const indexName = "langchain-docs-3072";
+const index = pinecone.index(indexName);
+const embeddings = new GoogleGenerativeAIEmbeddings({ model: "gemini-embedding-001", apiKey: process.env.GOOGLE_API_KEY });
+const vector = await embeddings.embedQuery("hello world");
+console.log("vector length", vector.length);
+await index.namespace("").upsert([{ id: "test-1", values: vector, metadata: { text: "hello world" } }]);
+console.log("upsert succeeded");
